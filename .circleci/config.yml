@@ -1,0 +1,41 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/configuration-reference
+version: 2
+
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/configuration-reference/#jobs
+jobs:
+  build:
+    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/configuration-reference/#executor-job
+    docker:
+      - image: circleci/python:3.7
+    # Add steps to the job
+    # See: https://circleci.com/docs/configuration-reference/#steps
+    working_directory: ~/devopss
+     
+
+# Orchestrate jobs using workflows
+# See: https://circleci.com/docs/configuration-reference/#workflows
+steps:
+  - checkout
+  - run:
+        name: install dependencies
+        command: |
+                  python3 -m venv venv
+                  . venv/bin/activate
+                  pip install -r requirements.txt
+  - run: 
+          name: run tests
+          command: |
+                  . venv/bin/activate
+                  flake8 --exclude=venv* --statistics
+                  # pytest -v --cov=calculator
+                  pytest --junitxml=test-results/junit.xml
+  - store_test_results:
+          path: test-results
+  - store_artifacts: 
+          path: test-results        
+  
+
+    
